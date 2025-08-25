@@ -1,15 +1,196 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRUD-PF</title>
-  <script src="main.js"></script> 
+    <meta charset="UTF-8">
+    <title>Minha Lista de Jogos</title>
 </head>
 <body>
-  <header></header>
-  <body></body>
-  <footer></footer>  
-  
+    <header>
+      <link rel="stylesheet" href="styles.css">
+        <nav>
+            <button id="btn-inicio" class="nav-btn">Início</button>
+            <button id="btn-minha-lista" class="nav-btn">Minha Lista</button>
+        </nav>
+    </header>
+
+    <main id="app-content"></main>
+
+    <div id="modal-overlay" class="hidden">
+        <div id="modal">
+            <h2 id="modal-title"></h2>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. ESTADO DA APLICAÇÃO ---
+        // Objeto que guardará todos os nossos dados e a tela ativa.
+        let state = {
+            jogos: [],
+            activeView: 'inicio' // 'inicio' ou 'minha-lista'
+        };
+
+        // --- 2. DADOS INICIAIS ---
+        // Esta lista só será usada na primeira vez que o usuário abrir a página.
+        const listaDeJogosInicial = [
+            { id: 1, nome: "The Witcher 3: Wild Hunt", avaliacao: null },
+            { id: 2, nome: "Hades", avaliacao: null },
+            { id: 3, nome: "Stardew Valley", avaliacao: null },
+            { id: 4, nome: "Cyberpunk 2077", avaliacao: null },
+            { id: 5, nome: "Red Dead Redemption 2", avaliacao: null }
+        ];
+
+        // --- 3. LÓGICA DE PERSISTÊNCIA com localStorage ---
+        // O localStorage só armazena texto. Por isso usamos JSON.stringify e JSON.parse.
+        function salvarDados() {
+            localStorage.setItem('meusJogos', JSON.stringify(state.jogos));
+        }
+
+        function carregarDados() {
+            const dadosSalvos = localStorage.getItem('meusJogos');
+            if (dadosSalvos) {
+                return JSON.parse(dadosSalvos);
+            } else {
+                return listaDeJogosInicial; // Se não houver nada salvo, usa a lista inicial
+            }
+        }
+
+        // --- 4. FUNÇÕES PURAS (lógica de manipulação de dados) ---
+        const adicionarOuEditarAvaliacao = (lista, jogoId, novaAvaliacao) => {
+            return lista.map(j => j.id === jogoId ? { ...j, avaliacao: novaAvaliacao } : j);
+        };
+        const excluirAvaliacao = (lista, jogoId) => {
+            return lista.map(j => j.id === jogoId ? { ...j, avaliacao: null } : j);
+        };
+
+        // --- 5. LÓGICA DO POP-UP (MODAL) ---
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+
+        function fecharModal() {
+            modalOverlay.classList.add('hidden');
+        }
+
+        function abrirModal(jogoId) {
+            const jogo = state.jogos.find(j => j.id === jogoId);
+            const modoEdicao = !!jogo.avaliacao; // !! transforma em booleano (true se tiver avaliação)
+
+            modalTitle.textContent = modoEdicao ? `Editar Avaliação de ${jogo.nome}` : `Avaliar ${jogo.nome}`;
+            
+            modalContent.innerHTML = `
+                <div class="form-group">
+                    <label for="nota">Nota (1-5)</label>
+                    <input type="number" id="nota-input" value="${modoEdicao ? jogo.avaliacao.nota : ''}" min="1" max="5">
+                </div>
+                <div class="form-group">
+                    <label for="comentario">Comentário</label>
+                    <textarea id="comentario-input">${modoEdicao ? jogo.avaliacao.comentario : ''}</textarea>
+                </div>
+                <div class="modal-actions">
+                    <button id="btn-cancelar" class="btn btn-secondary">Cancelar</button>
+                    <button id="btn-salvar-modal" class="btn btn-primary" data-id="${jogo.id}">Salvar</button>
+                </div>
+            `;
+            
+            modalOverlay.classList.remove('hidden');
+
+            document.getElementById('btn-cancelar').onclick = fecharModal;
+            document.getElementById('btn-salvar-modal').onclick = () => {
+                const novaAvaliacao = {
+                    nota: parseInt(document.getElementById('nota-input').value) || 0,
+                    comentario: document.getElementById('comentario-input').value
+                };
+                state.jogos = adicionarOuEditarAvaliacao(state.jogos, jogoId, novaAvaliacao);
+                salvarDados();
+                render();
+                fecharModal();
+            };
+        }
+        
+        // --- 6. MOTOR DE RENDERIZAÇÃO ---
+        // A função principal que desenha a tela inteira baseada no estado atual.
+        function render() {
+            const appContent = document.getElementById('app-content');
+            appContent.innerHTML = ''; // Limpa o conteúdo anterior
+
+            // Atualiza os botões de navegação
+            document.getElementById('btn-inicio').classList.toggle('active', state.activeView === 'inicio');
+            document.getElementById('btn-minha-lista').classList.toggle('active', state.activeView === 'minha-lista');
+
+            // Decide qual lista de jogos mostrar
+            const listaParaRenderizar = state.activeView === 'inicio' 
+                ? state.jogos 
+                : state.jogos.filter(jogo => jogo.avaliacao !== null);
+            
+            if (listaParaRenderizar.length === 0) {
+                appContent.innerHTML = '<p>Nenhum jogo para exibir nesta seção.</p>';
+            }
+
+            listaParaRenderizar.forEach(jogo => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                
+                let botoesHTML = '';
+                if (state.activeView === 'inicio') {
+                    botoesHTML = `<button class="btn btn-primary" data-action="avaliar" data-id="${jogo.id}">
+                        ${jogo.avaliacao ? 'Ver/Editar Avaliação' : 'Avaliar'}
+                    </button>`;
+                } else { // activeView === 'minha-lista'
+                    botoesHTML = `
+                        <button class="btn btn-secondary" data-action="editar" data-id="${jogo.id}">Editar</button>
+                        <button class="btn btn-danger" data-action="excluir" data-id="${jogo.id}">Excluir</button>`;
+                }
+
+                card.innerHTML = `
+                    <div class="game-card-info">
+                        <h3>${jogo.nome}</h3>
+                        ${jogo.avaliacao ? `<p>Sua nota: ${jogo.avaliacao.nota} ★</p>` : ''}
+                    </div>
+                    <div class="game-card-actions">${botoesHTML}</div>`;
+                appContent.appendChild(card);
+            });
+        }
+
+        // --- 7. INICIALIZAÇÃO E EVENTOS ---
+        function iniciar() {
+            // Carrega os dados salvos ou os iniciais
+            state.jogos = carregarDados();
+            
+            // Configura os cliques nos botões de navegação
+            document.getElementById('btn-inicio').addEventListener('click', () => {
+                state.activeView = 'inicio';
+                render();
+            });
+            document.getElementById('btn-minha-lista').addEventListener('click', () => {
+                state.activeView = 'minha-lista';
+                render();
+            });
+
+            // Gerenciador central de eventos para os botões dos jogos
+            document.getElementById('app-content').addEventListener('click', (event) => {
+                const action = event.target.dataset.action;
+                const id = parseInt(event.target.dataset.id);
+                if (!action) return;
+
+                if (action === 'avaliar' || action === 'editar') {
+                    abrirModal(id);
+                }
+                if (action === 'excluir') {
+                    if (confirm('Tem certeza que deseja excluir esta avaliação?')) {
+                        state.jogos = excluirAvaliacao(state.jogos, id);
+                        salvarDados();
+                        render();
+                    }
+                }
+            });
+
+            // Renderiza a tela inicial
+            render();
+        }
+
+        // Inicia a aplicação!
+        iniciar();
+    </script>
 </body>
 </html>
