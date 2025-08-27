@@ -4,8 +4,6 @@ Arquivo principal
 2-Configura e responde aos eventos
 3-Manipula as funções de API e UI mantendo a tela sincronizada
  */
-
-
 import { buscarJogosDaAPI, buscarJogoPorNomeAPI, carregarJogosSalvos, salvarJogos, atualizarJogo } from './acervo.js';
 
 // --- ESTADO DA APLICAÇÃO ---
@@ -36,21 +34,22 @@ const searchInput = document.getElementById('search-input');
 const searchClearBtn = document.getElementById('search-clear-btn');
 const genreFilter = document.getElementById('genre-filter');
 const yearFilter = document.getElementById('year-filter');
-const platformFilter = document.getElementById('platform-filter')
+const platformFilter = document.getElementById('platform-filter');
 const sortFilter = document.getElementById('sort-filter');
 
 // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
 
 /*
-Funçào impura: Fecha o modal.
+Função impura: Fecha o modal.
 Efeito colateral: manipula o DOM
 */
 function fecharModal() {
     modalOverlay.classList.add('hidden');
 }
+
 /*
 Função impura: Abre o modal para ver o comentario completo 
-colateral: manipula o DOM
+Efeito colateral: manipula o DOM
 */
 function abrirModalVerMais(jogo) {
     modalTitle.textContent = `Avaliação de "${jogo.titulo}"`;
@@ -58,9 +57,10 @@ function abrirModalVerMais(jogo) {
     document.getElementById('btn-fechar-modal').onclick = fecharModal;
     modalOverlay.classList.remove('hidden');
 }
+
 /*
 Função Impura: Abre o modal para avaliar ou editar uma avaliação
-colateral: manipula o DOM
+Efeito colateral: manipula o DOM
  */
 function abrirModalAvaliacao(jogo, onSave) {
     const modoEdicao = !!jogo.avaliacao;
@@ -89,6 +89,7 @@ function abrirModalAvaliacao(jogo, onSave) {
         }
     };
 }
+
 /*
 Função impura: parte HTML, le o estado e modifica o DOM para refletir esse estado
 */
@@ -116,17 +117,19 @@ function appEngine(estado) {
     if (estado.filtroPlataforma) {
         listaParaFiltrar = listaParaFiltrar.filter(j => j.plataformas.includes(estado.filtroPlataforma));
     }
+    
+    const listaOrdenada = [...listaParaFiltrar];
     if (estado.ordenacao === 'recentes') {
-        listaParaFiltrar.sort((a, b) => new Date(b.dataDeLancamento) - new Date(a.dataDeLancamento));
+        listaOrdenada.sort((a, b) => new Date(b.dataDeLancamento) - new Date(a.dataDeLancamento));
     } else if (estado.ordenacao === 'antigos') {
-        listaParaFiltrar.sort((a, b) => new Date(a.dataDeLancamento) - new Date(b.dataDeLancamento));
+        listaOrdenada.sort((a, b) => new Date(a.dataDeLancamento) - new Date(b.dataDeLancamento));
     }
 
     appContent.innerHTML = '';
-    if (listaParaFiltrar.length === 0) {
+    if (listaOrdenada.length === 0) {
         appContent.innerHTML = '<p class="empty-message">Nenhum jogo encontrado.</p>';
     } else {
-        listaParaFiltrar.forEach(jogo => {
+        listaOrdenada.forEach(jogo => {
             const card = document.createElement('div');
             card.className = 'game-card';
             let botoesHTML = '';
@@ -156,8 +159,9 @@ function appEngine(estado) {
         });
     }
 }
+
 /*
-Funçào impura: popula os menus de filto com base na lista de jogos atual
+Função impura: popula os menus de filtro com base na lista de jogos atual
  */
 function popularFiltros(jogos) {
     const todosOsGeneros = jogos.flatMap(jogo => jogo.generos);
@@ -169,15 +173,14 @@ function popularFiltros(jogos) {
         option.textContent = genero;
         genreFilter.appendChild(option);
     });
+    
     const anoAtual = new Date().getFullYear();
     const anoInicial = 1980;
-    yearFilter.innerHTML = '<option value="">Todos os Anos</option>';
-    for (let ano = anoAtual; ano >= anoInicial; ano--) {
-        const option = document.createElement('option');
-        option.value = ano;
-        option.textContent = ano;
-        yearFilter.appendChild(option);
-    }
+    const numeroDeAnos = anoAtual - anoInicial + 1;
+    const todosOsAnos = Array.from({ length: numeroDeAnos }, (_, index) => anoAtual - index);
+    const anosOptionsHTML = todosOsAnos.map(ano => `<option value="${ano}">${ano}</option>`).join('');
+    yearFilter.innerHTML = '<option value="">Todos os Anos</option>' + anosOptionsHTML;
+
     const todasAsPlataformas = jogos.flatMap(jogo => jogo.plataformas);
     const plataformasUnicas = [...new Set(todasAsPlataformas)].sort();
     platformFilter.innerHTML = '<option value="">Todas as Plataformas</option>';
@@ -186,7 +189,7 @@ function popularFiltros(jogos) {
         option.value = plataforma;
         option.textContent = plataforma;
         platformFilter.appendChild(option);
-    })
+    });
 }
 
 /*
@@ -197,25 +200,18 @@ function update(currentState, action) {
     switch (action.type) {
         case 'SET_GAMES':
             return { ...currentState, jogos: action.payload };
-        
         case 'CHANGE_VIEW':
             return { ...currentState, activeView: action.payload, termoBusca: '' };
-
         case 'SET_SEARCH_TERM':
             return { ...currentState, termoBusca: action.payload };
-
         case 'SET_GENRE_FILTER':
             return { ...currentState, filtroGenero: action.payload };
-        
         case 'SET_YEAR_FILTER':
             return { ...currentState, filtroAno: action.payload };
-        
         case 'SET_PLATFORM_FILTER':
             return { ...currentState, filtroPlataforma: action.payload };
-
         case 'SET_SORTING':
             return { ...currentState, ordenacao: action.payload };
-
         default:
             return currentState;
     }
@@ -232,7 +228,7 @@ function dispatch(action) {
 
 // --- LÓGICA DE EVENTOS ---
 /*
-Função impura: Configura todos os evente listeners da página
+Função impura: Configura todos os event listeners da página
 traduz eventos do usuario em ações
 */
 function configurarEventos() {
@@ -242,7 +238,7 @@ function configurarEventos() {
     
     genreFilter.onchange = (e) => dispatch({ type: 'SET_GENRE_FILTER', payload: e.target.value });
     yearFilter.onchange = (e) => dispatch({ type: 'SET_YEAR_FILTER', payload: e.target.value });
-    platformFilter.onchange = (e) => dispatch({ type: 'SET_PLATFORM_FILTER', payload: e.target.value })
+    platformFilter.onchange = (e) => dispatch({ type: 'SET_PLATFORM_FILTER', payload: e.target.value });
     sortFilter.onchange = (e) => dispatch({ type: 'SET_SORTING', payload: e.target.value });
 
     searchInput.onkeyup = async (event) => {
@@ -256,6 +252,7 @@ function configurarEventos() {
             const listaCompleta = [...estado.jogos, ...novosJogos];
             dispatch({ type: 'SET_GAMES', payload: listaCompleta });
             dispatch({ type: 'SET_SEARCH_TERM', payload: termoBusca });
+            popularFiltros(listaCompleta);
         } else if (termoBusca === '') {
             dispatch({ type: 'SET_SEARCH_TERM', payload: '' });
         }
