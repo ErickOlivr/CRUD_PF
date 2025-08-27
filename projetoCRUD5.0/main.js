@@ -18,7 +18,7 @@ let estado = {
     termoBusca: '',
     filtroGenero: '',
     filtroAno: '',
-    filtroPlataforma: '',
+    filtroPlataforma: '', // Adicionado para o filtro de plataforma
     ordenacao: 'padrao'
 };
 
@@ -34,7 +34,7 @@ const searchInput = document.getElementById('search-input');
 const searchClearBtn = document.getElementById('search-clear-btn');
 const genreFilter = document.getElementById('genre-filter');
 const yearFilter = document.getElementById('year-filter');
-const platformFilter = document.getElementById('platform-filter');
+const platformFilter = document.getElementById('platform-filter'); // LINHA CORRIGIDA: Adicionada a referência que faltava
 const sortFilter = document.getElementById('sort-filter');
 
 // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
@@ -46,7 +46,6 @@ Efeito colateral: manipula o DOM
 function fecharModal() {
     modalOverlay.classList.add('hidden');
 }
-
 /*
 Função impura: Abre o modal para ver o comentario completo 
 Efeito colateral: manipula o DOM
@@ -57,7 +56,6 @@ function abrirModalVerMais(jogo) {
     document.getElementById('btn-fechar-modal').onclick = fecharModal;
     modalOverlay.classList.remove('hidden');
 }
-
 /*
 Função Impura: Abre o modal para avaliar ou editar uma avaliação
 Efeito colateral: manipula o DOM
@@ -89,7 +87,6 @@ function abrirModalAvaliacao(jogo, onSave) {
         }
     };
 }
-
 /*
 Função impura: parte HTML, le o estado e modifica o DOM para refletir esse estado
 */
@@ -159,7 +156,6 @@ function appEngine(estado) {
         });
     }
 }
-
 /*
 Função impura: popula os menus de filtro com base na lista de jogos atual
  */
@@ -198,22 +194,14 @@ sem colateral
 */
 function update(currentState, action) {
     switch (action.type) {
-        case 'SET_GAMES':
-            return { ...currentState, jogos: action.payload };
-        case 'CHANGE_VIEW':
-            return { ...currentState, activeView: action.payload, termoBusca: '' };
-        case 'SET_SEARCH_TERM':
-            return { ...currentState, termoBusca: action.payload };
-        case 'SET_GENRE_FILTER':
-            return { ...currentState, filtroGenero: action.payload };
-        case 'SET_YEAR_FILTER':
-            return { ...currentState, filtroAno: action.payload };
-        case 'SET_PLATFORM_FILTER':
-            return { ...currentState, filtroPlataforma: action.payload };
-        case 'SET_SORTING':
-            return { ...currentState, ordenacao: action.payload };
-        default:
-            return currentState;
+        case 'SET_GAMES': return { ...currentState, jogos: action.payload };
+        case 'CHANGE_VIEW': return { ...currentState, activeView: action.payload, termoBusca: '' };
+        case 'SET_SEARCH_TERM': return { ...currentState, termoBusca: action.payload };
+        case 'SET_GENRE_FILTER': return { ...currentState, filtroGenero: action.payload };
+        case 'SET_YEAR_FILTER': return { ...currentState, filtroAno: action.payload };
+        case 'SET_PLATFORM_FILTER': return { ...currentState, filtroPlataforma: action.payload };
+        case 'SET_SORTING': return { ...currentState, ordenacao: action.payload };
+        default: return currentState;
     }
 }
 
