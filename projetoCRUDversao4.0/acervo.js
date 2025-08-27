@@ -1,9 +1,16 @@
-// --- IMPORTANTE: COLE SUA CHAVE DA API DA RAWG AQUI ---
+/*
++Responsavel pela comunicação externa
+1-Conversar com a API
+2-Conversar com o LOCALSTORAGE
+(isolamos as funçoes impuras aqui)
+*/ 
+//Chave da API
 const MINHA_CHAVE_API = '2f6956d5c561418d881197a4220dfbcc';
 
+/*+Função PURA = Transforma um objeto de jogo vindo da API para o formato desejado
+-jogoAPI é o objeto de jogo da API
+*/ 
 const STORAGE_KEY = 'meusJogosDoAcervo';
-
-// Função auxiliar para adaptar um jogo da API para o nosso formato
 const adaptarJogo = (jogoAPI) => ({
     id: jogoAPI.id,
     titulo: jogoAPI.name,
@@ -16,7 +23,7 @@ const adaptarJogo = (jogoAPI) => ({
     imagemUrl: jogoAPI.background_image,
 });
 
-// Função de busca por nome específico (sem alterações)
+//Função IMPURA = Busca um jogo especifico na API pelo nome
 export async function buscarJogoPorNomeAPI(termoBusca) {
     if (!MINHA_CHAVE_API || MINHA_CHAVE_API === 'SUA_CHAVE_API_VEM_AQUI') {
         console.error("Chave da API não fornecida.");
@@ -34,13 +41,12 @@ export async function buscarJogoPorNomeAPI(termoBusca) {
     }
 }
 
-// --- FUNÇÃO DE BUSCA SIMPLIFICADA PARA UMA ÚNICA CHAMADA ---
+//Função impura = busca a lista inicial de jogos, misturando classicos e recentes
 export async function buscarJogosDaAPI() {
     if (!MINHA_CHAVE_API || MINHA_CHAVE_API === 'SUA_CHAVE_API_VEM_AQUI') {
         console.error("Chave da API não fornecida ou inválida. Verifique o arquivo acervo.js");
         return [];
     }
-    // Faz uma única busca pelos 40 jogos mais bem avaliados de todos os tempos
     const endpoint = `https://api.rawg.io/api/games?key=${MINHA_CHAVE_API}&page_size=1000&ordering=-metacritic`;
 
     try {
@@ -49,7 +55,7 @@ export async function buscarJogosDaAPI() {
             throw new Error(`Erro na API: ${response.statusText}`);
         }
         const data = await response.json();
-        return data.results.map(adaptarJogo); // Adapta os resultados e retorna
+        return data.results.map(adaptarJogo);
 
     } catch (error) {
         console.error("Falha ao buscar jogos da API:", error);
@@ -57,10 +63,14 @@ export async function buscarJogosDaAPI() {
     }
 }
 
-// Funções de Persistência e CRUD (sem alterações)
+//Funções de Armazenamento Local (localStorage)
+
+//Função impura/pura = le os jogos que estào salvos no localStorage
 export const carregarJogosSalvos = () => {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
 };
+//função impura/pura = Salva a lista de jogos atual no localStorage
 export const salvarJogos = jogos => localStorage.setItem(STORAGE_KEY, JSON.stringify(jogos));
+//função pura = recebe uma lista e retorna uma nova lista com um jogo atualizado
 export const atualizarJogo = (jogos, id, atualizacoes) => jogos.map(jogo => (jogo.id === id ? { ...jogo, ...atualizacoes } : jogo));
