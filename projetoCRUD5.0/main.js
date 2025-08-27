@@ -204,7 +204,7 @@ function update(currentState, action) {
         default: return currentState;
     }
 }
-
+//Dispacha os novos esados no update para a criação de uma novo estado
 function dispatch(action) {
     const novoEstado = update(estado, action);
     estado = novoEstado;
