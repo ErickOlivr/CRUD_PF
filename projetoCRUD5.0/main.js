@@ -18,7 +18,7 @@ let estado = {
     termoBusca: '',
     filtroGenero: '',
     filtroAno: '',
-    filtroPlataforma: '', // Adicionado para o filtro de plataforma
+    filtroPlataforma: '', 
     ordenacao: 'padrao'
 };
 
@@ -34,7 +34,7 @@ const searchInput = document.getElementById('search-input');
 const searchClearBtn = document.getElementById('search-clear-btn');
 const genreFilter = document.getElementById('genre-filter');
 const yearFilter = document.getElementById('year-filter');
-const platformFilter = document.getElementById('platform-filter'); // LINHA CORRIGIDA: Adicionada a referência que faltava
+const platformFilter = document.getElementById('platform-filter'); 
 const sortFilter = document.getElementById('sort-filter');
 
 // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
@@ -204,7 +204,7 @@ function update(currentState, action) {
         default: return currentState;
     }
 }
-
+//Dispacha os novos esados no update para a criação de uma novo estado
 function dispatch(action) {
     const novoEstado = update(estado, action);
     estado = novoEstado;
