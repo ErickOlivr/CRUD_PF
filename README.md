@@ -100,4 +100,4 @@ Arquivo api.js:
 
 ###  Busca Inteligente e Expansiva: A barra de pesquisa não apenas filtra a lista inicial, mas também busca o item desejado na própria API, permitindo que a coleção pessoal do usuário cresça de forma orgânica.
 
-### [Vídeo de explicação do nosso (https://youtu.be/r75y-5efgsk)]]
+### [[Vídeo de explicação do nosso CRUD] (https://youtu.be/r75y-5efgsk)]
