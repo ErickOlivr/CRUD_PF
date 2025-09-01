@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Acervo de Jogos</title>
-    <link rel="stylesheet" href="test.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header>
-        <h1>Meu Acervo</h1>
+        <h1>My Game List</h1>
         <nav>
             <button id="btn-inicio" class="nav-btn">Início</button>
             <button id="btn-minha-lista" class="nav-btn">Minha Lista</button>
@@ -18,7 +21,7 @@
 
         <div id="filter-controls">
             <div id="search-container" class="search-container">
-                <input type="text" id="search-input" placeholder="Buscar jogos e pressionar Enter..." spellcheck="false">
+                <input type="text" id="search-input" placeholder="Buscar jogos..." spellcheck="false">
                 <button id="search-clear-btn" class="search-clear-btn hidden" aria-label="Limpar busca">&times;</button>
             </div>
             <select id="genre-filter">
@@ -34,12 +37,18 @@
                 <option value="padrao">Ordenar por Padrão</option>
                 <option value="recentes">Mais Recentes</option>
                 <option value="antigos">Mais Antigos</option>
+                <option value="alfabetica_az">Alfabética (A-Z)</option>
+                <option value="alfabetica_za">Alfabética (Z-A)</option>
             </select>
+            <button id="btn-limpar-minha-lista" class="btn btn-danger btn-limpar hidden">Limpar Minha Lista</button>
+            <button id="btn-limpar-desejos" class="btn btn-danger btn-limpar hidden">Limpar Desejos</button>
         </div>
         
     </header>
 
     <main id="app-content"></main>
+
+    <footer id="pagination-controls" class="pagination-controls"></footer>
 
     <div id="modal-overlay" class="hidden">
         <div id="modal">
