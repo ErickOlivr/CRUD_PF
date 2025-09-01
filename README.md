@@ -99,5 +99,5 @@ Arquivo api.js:
  ### Fonte de Dados Híbrida (API e LocalStorage): O acervo não começa vazio. A aplicação busca uma lista curada de jogos da API e a mescla com os dados pessoais do usuário, combinando descoberta de conteúdo com personalização.
 
 ###  Busca Inteligente e Expansiva: A barra de pesquisa não apenas filtra a lista inicial, mas também busca o item desejado na própria API, permitindo que a coleção pessoal do usuário cresça de forma orgânica.
-
-### [[Vídeo de explicação do nosso CRUD] (https://youtu.be/r75y-5efgsk)]
+---
+- [[Vídeo de explicação do nosso CRUD] (https://youtu.be/r75y-5efgsk)]
