@@ -1,56 +1,70 @@
 Documentação Explicativa do Projeto: Acervo de Jogos (CRUD)
 Este documento detalha um gerenciador de acervo pessoal de jogos que permite ao usuário descobrir títulos, avaliar os que já jogou e manter uma lista de desejos.
 
-Estrutura
-O projeto foi dividido em 4 arquivos:
+O projeto foi modularizado em 5 arquivos principais para separar responsabilidades, seguindo boas práticas de desenvolvimento:
 
-teste.html: O esqueleto da página.
+index.html: O esqueleto da página, contendo a estrutura semântica dos elementos.
 
-test.css: A estilização visual.
+style.css: A estilização visual, responsável pela identidade e layout da aplicação.
 
-acervo.js: A camada de serviço, que lida com a comunicação com a API externa e o armazenamento local (localStorage).
+api.js: A camada de serviço, que lida exclusivamente com a comunicação com a API externa (RAWG) e com o armazenamento local (localStorage).
 
-main.js: A camada de lógica, que orquestra o estado, os eventos e a renderização da interface.
+lib.js: O "coração" lógico da aplicação. Contém as funções puras para manipulação de dados e gerenciamento de estado.
+
+ui.js: A camada de visualização, responsável por toda a manipulação do DOM, como renderizar os cards, controlar modais e popular filtros.
+
+main.js: A camada controladora, que orquestra todo o fluxo, conectando os eventos do usuário (da ui.js) com a lógica de estado (da lib.js) и as fontes de dados (da api.js).
 
 Fluxo de Dados Unidirecional e Imutável
-O fluxo de dados da aplicação segue o padrão: Ação -> Update -> Renderização.
+O fluxo de dados da aplicação segue o padrão: Ação do Usuário -> dispatch -> update -> Renderização.
 
-O estado atual da interface (UI) é mantido em um único objeto.
+O estado atual da interface (UI) é mantido em um único objeto JavaScript.
 
-Uma Ação do usuário (ex: um clique) é despachada (dispatch).
+Uma Ação do usuário (ex: um clique) é capturada em main.js e enviada para a função dispatch.
 
-A função update recebe o estado atual e a ação, e retorna um novo estado, sem modificar o original (imutabilidade).
+A função dispatch chama a função update (de lib.js), que recebe o estado atual e a ação, e retorna um novo objeto de estado, sem modificar o original (imutabilidade).
 
-A função appEngine recebe o novo estado e redesenha a interface para o usuário.
+O dispatch então chama a função appEngine (de ui.js) que, baseada no novo estado, redesenha a interface para o usuário.
 
-Funções
-Arquivo acervo.js:
+Funções principais:
+Arquivo api.js:
 
-buscarJogosDaAPI(): Faz duas buscas na API (clássicos e recentes), junta os resultados, remove duplicatas e traduz para o formato desejado.
+buscarJogosIniciais(): Faz duas buscas na API (clássicos e recentes), junta os resultados, remove duplicatas e os adapta para o formato da aplicação.
 
-buscarJogoPorNomeAPI(): Realiza uma busca específica do nome do jogo na API.
+buscarJogoPorNome(): Realiza uma busca específica pelo nome de um jogo na API.
 
-carregarJogosSalvos(): Lê a lista de jogos com avaliações e desejos do usuário que está salva no localStorage.
+carregarJogosSalvos(): Lê do localStorage a lista de jogos com avaliações e desejos do usuário.
 
 salvarJogos(): Pega a lista de jogos atual e a salva no localStorage.
 
-atualizarJogo(): Recebe o ID de um jogo e as atualizações, e retorna uma nova lista com o jogo correspondente alterado.
+Arquivo lib.js:
 
-Arquivo main.js:
+update(): Função "reducer" pura que contém toda a lógica de transição de estados. Recebe o estado antigo e uma ação, e retorna o novo estado.
 
-iniciar(): Primeira função a ser executada. Coordena o carregamento inicial: busca dados da API, mescla com os jogos salvos, popula os filtros, configura os eventos e chama a renderização da interface.
+processarJogosParaView(): Filtra e ordena a lista de jogos com base na visualização ativa e nos filtros selecionados antes da renderização.
 
-update(): Contém toda a lógica de transição de estados de forma pura e imutável.
+atualizarJogo(): Recebe o ID de um jogo e as atualizações, e retorna uma nova lista com o jogo correspondente alterado de forma imutável.
 
-dispatch(): Orquestra o fluxo, aplicando o novo estado e disparando a renderização.
-
-appEngine(): Lê o objeto de estado e renderiza a representação visual no DOM.
-
-configurarEventos(): Mapeia as interações do usuário (eventos) para o dispatch de ações.
+mesclarListas(): Combina a lista de jogos principal com resultados de busca, evitando duplicatas.
 
 É importante citar que, embora funções como appEngine sejam impuras (pois manipulam o DOM), elas contêm "bolsões de pureza", como os trechos de código que filtram e ordenam os dados antes da renderização.
 
-Resumo das Ações do CRUD
+Arquivo ui.js:
+
+appEngine(): Lê o objeto de estado e renderiza toda a representação visual no DOM, incluindo os cards e a paginação.
+
+abrirModalAvaliacao() / abrirModalVerMais(): Funções que manipulam o DOM para exibir e controlar os modais da aplicação.
+
+popularFiltros(): Preenche dinamicamente os menus de filtro com base nos dados dos jogos carregados.
+
+Arquivo main.js:
+
+iniciar(): Primeira função a ser executada. Coordena o carregamento inicial: busca dados da API e do localStorage, mescla as listas, popula os filtros, configura os eventos e chama a primeira renderização.
+
+dispatch(): Orquestra o fluxo de dados, chamando update para obter o novo estado e appEngine para disparar a renderização.
+
+configurarEventos(): Mapeia todas as interações do usuário (eventos de clique, digitação, etc.) para o dispatch de ações correspondentes.
+Ações do CRUD
 CREATE (Criar):
 
 Avaliar um jogo pela primeira vez (cria um registro de avaliação).
