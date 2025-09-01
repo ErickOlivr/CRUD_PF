@@ -29,43 +29,44 @@ Fluxo de Dados Unidirecional e Imutável
 Funções principais:
 Arquivo api.js:
 
--buscarJogosIniciais(): Faz duas buscas na API (clássicos e recentes), junta os resultados, remove duplicatas e os adapta para o formato da aplicação.
+-buscarJogosIniciais: Faz duas buscas na API (clássicos e recentes), junta os resultados, remove duplicatas e os adapta para o formato da aplicação.
 
--buscarJogoPorNome(): Realiza uma busca específica pelo nome de um jogo na API.
+-buscarJogoPorNome: Realiza uma busca específica pelo nome de um jogo na API.
 
--carregarJogosSalvos(): Lê do localStorage a lista de jogos com avaliações e desejos do usuário.
+-carregarJogosSalvos: Lê do localStorage a lista de jogos com avaliações e desejos do usuário.
 
--salvarJogos(): Pega a lista de jogos atual e a salva no localStorage.
+-salvarJogos: Pega a lista de jogos atual e a salva no localStorage.
 
 Arquivo lib.js:
 
--update(): Função "reducer" pura que contém toda a lógica de transição de estados. Recebe o estado antigo e uma ação, e retorna o novo estado.
+-update: Função "reducer" pura que contém toda a lógica de transição de estados. Recebe o estado antigo e uma ação, e retorna o novo estado.
 
--processarJogosParaView(): Filtra e ordena a lista de jogos com base na visualização ativa e nos filtros selecionados antes da renderização.
+-processarJogosParaView: Filtra e ordena a lista de jogos com base na visualização ativa e nos filtros selecionados antes da renderização.
 
--atualizarJogo(): Recebe o ID de um jogo e as atualizações, e retorna uma nova lista com o jogo correspondente alterado de forma imutável.
+-atualizarJogo: Recebe o ID de um jogo e as atualizações, e retorna uma nova lista com o jogo correspondente alterado de forma imutável.
 
--mesclarListas(): Combina a lista de jogos principal com resultados de busca, evitando duplicatas.
-
-  É importante citar que, embora funções como appEngine sejam impuras (pois manipulam o DOM), elas contêm "bolsões de pureza", como os trechos de código que filtram e ordenam os dados antes da renderização.
+-mesclarListas: Combina a lista de jogos principal com resultados de busca, evitando duplicatas.
 
 Arquivo ui.js:
 
--appEngine(): Lê o objeto de estado e renderiza toda a representação visual no DOM, incluindo os cards e a paginação.
+-appEngine: Lê o objeto de estado e renderiza toda a representação visual no DOM, incluindo os cards e a paginação.
 
--abrirModalAvaliacao() / abrirModalVerMais(): Funções que manipulam o DOM para exibir e controlar os modais da aplicação.
+-abrirModalAvaliacao / abrirModalVerMais: Funções que manipulam o DOM para exibir e controlar os modais da aplicação.
 
--popularFiltros(): Preenche dinamicamente os menus de filtro com base nos dados dos jogos carregados.
+-popularFiltros: Preenche dinamicamente os menus de filtro com base nos dados dos jogos carregados.
 
 Arquivo main.js:
 
--iniciar(): Primeira função a ser executada. Coordena o carregamento inicial: busca dados da API e do localStorage, mescla as listas, popula os filtros, configura os eventos e chama a primeira renderização.
+-iniciar: Primeira função a ser executada. Coordena o carregamento inicial: busca dados da API e do localStorage, mescla as listas, popula os filtros, configura os eventos e chama a primeira renderização.
 
--dispatch(): Orquestra o fluxo de dados, chamando update para obter o novo estado e appEngine para disparar a renderização.
+-dispatch: Orquestra o fluxo de dados, chamando update para obter o novo estado e appEngine para disparar a renderização.
 
--configurarEventos(): Mapeia todas as interações do usuário (eventos de clique, digitação, etc.) para o dispatch de ações correspondentes.
+-configurarEventos: Mapeia todas as interações do usuário (eventos de clique, digitação, etc.) para o dispatch de ações correspondentes.
+
+É importante citar que, embora funções como appEngine sejam impuras (pois manipulam o DOM), elas contêm "bolsões de pureza", como os trechos de código que filtram e ordenam os dados antes da renderização.
 
 Ações do CRUD
+
 CREATE (Criar):
 
 -Avaliar um jogo pela primeira vez (cria um registro de avaliação).
@@ -92,6 +93,7 @@ DELETE (Apagar):
 
 
 Diferenciais
+
   Arquitetura Funcional: A aplicação adota o modelo "Núcleo Puro, Casca Impura", onde a lógica de negócio é isolada em funções puras e imutáveis, tornando o código mais previsível e menos suscetível a bugs.
 
   Fonte de Dados Híbrida (API e LocalStorage): O acervo não começa vazio. A aplicação busca uma lista curada de jogos da API e a mescla com os dados pessoais do usuário, combinando descoberta de conteúdo com personalização.
