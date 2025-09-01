@@ -1,9 +1,9 @@
-Acervo de Jogos (CRUD)
+# Acervo de Jogos (CRUD)
   Este documento detalha um gerenciador de acervo pessoal de jogos que permite ao usuário descobrir títulos, avaliar os que já jogou e manter uma lista de desejos.
 
-O projeto foi modularizado em 5 arquivos principais para separar responsabilidades, seguindo boas práticas de desenvolvimento:
+## O projeto foi modularizado em 5 arquivos principais para separar responsabilidades, seguindo boas práticas de desenvolvimento:
 
--index.html: O esqueleto da página, contendo a estrutura semântica dos elementos.
+- index.html: O esqueleto da página, contendo a estrutura semântica dos elementos.
 
 -style.css: A estilização visual, responsável pela identidade e layout da aplicação.
 
